@@ -1,0 +1,50 @@
+name: Publish tokens from Figma
+
+on:
+  workflow_dispatch:
+    inputs:
+      figma_file_key:
+        description: Figma file key
+        required: true
+        type: string
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - draft
+          - staging
+          - production
+      destination:
+        description: Token destination
+        required: false
+        type: string
+      release_note:
+        description: Optional release note
+        required: false
+        type: string
+      source:
+        description: Trigger source
+        required: false
+        type: string
+
+jobs:
+  fetch-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Figma local variables
+        env:
+          FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
+          FIGMA_FILE_KEY: ${{ inputs.figma_file_key }}
+        run: |
+          curl -sS             -H "X-Figma-Token: ${FIGMA_TOKEN}"             "https://api.figma.com/v1/files/${FIGMA_FILE_KEY}/variables/local"             > figma-variables.json
+
+      - name: Transform tokens
+        run: |
+          echo "TODO: transform figma-variables.json into DTCG JSON"
+
+      - name: Publish artifacts
+        run: |
+          echo "TODO: commit generated tokens, open review, publish package, or upload artifact"

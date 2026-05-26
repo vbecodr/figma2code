@@ -1,0 +1,62 @@
+name: HaKa Publish Example
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: draft
+        type: choice
+        options:
+          - draft
+          - staging
+          - production
+      destination:
+        description: Destination label
+        required: true
+        default: default
+        type: string
+      release_note:
+        description: Release note from HaKa
+        required: false
+        type: string
+      figma_file_key:
+        description: Figma file key
+        required: false
+        type: string
+      source:
+        description: Caller
+        required: false
+        default: haka
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm trigger
+        run: |
+          echo "Source: ${{ inputs.source }}"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Destination: ${{ inputs.destination }}"
+          echo "Release note: ${{ inputs.release_note }}"
+          echo "Figma file key: ${{ inputs.figma_file_key }}"
+
+      - name: Fetch variables from Figma REST
+        env:
+          FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
+          FIGMA_FILE_KEY: ${{ inputs.figma_file_key }}
+        run: |
+          if [ -z "$FIGMA_TOKEN" ] || [ -z "$FIGMA_FILE_KEY" ]; then
+            echo "Provide FIGMA_TOKEN secret and figma_file_key input before using this workflow."
+            exit 1
+          fi
+          curl --fail --silent \
+            --header "X-Figma-Token: $FIGMA_TOKEN" \
+            "https://api.figma.com/v1/files/$FIGMA_FILE_KEY/variables/local" \
+            > figma-variables.json
+
+      - name: Run team publish logic
+        run: |
+          echo "Replace this step with your team-owned token transform and release steps."
