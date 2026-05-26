@@ -12,15 +12,6 @@ on:
           - draft
           - staging
           - production
-      destination:
-        description: Destination label
-        required: true
-        default: default
-        type: string
-      release_note:
-        description: Release note from HaKa
-        required: false
-        type: string
       figma_file_key:
         description: Figma file key
         required: false
@@ -51,8 +42,6 @@ jobs:
         run: |
           echo "Source: ${{ inputs.source }}"
           echo "Environment: ${{ inputs.environment }}"
-          echo "Destination: ${{ inputs.destination }}"
-          echo "Release note: ${{ inputs.release_note }}"
           echo "Figma file key: ${{ inputs.figma_file_key }}"
           echo "Variables payload format: ${{ inputs.variables_payload_format }}"
 

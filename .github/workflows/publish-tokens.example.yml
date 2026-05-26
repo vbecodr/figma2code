@@ -15,14 +15,6 @@ on:
           - draft
           - staging
           - production
-      destination:
-        description: Token destination
-        required: false
-        type: string
-      release_note:
-        description: Optional release note
-        required: false
-        type: string
       variables_payload_format:
         description: Variables payload format from HaKa
         required: true
