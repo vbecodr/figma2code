@@ -1,0 +1,51 @@
+name: Publish tokens from Figma REST
+
+on:
+  workflow_dispatch:
+    inputs:
+      figma_file_key:
+        description: Figma file key
+        required: true
+        type: string
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - draft
+          - staging
+          - production
+      source:
+        description: Trigger source
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch variables from Figma REST
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+          FIGMA_FILE_KEY: ${{ inputs.figma_file_key }}
+        run: |
+          if [ -z "$FIGMA_ACCESS_TOKEN" ]; then
+            echo "Missing FIGMA_ACCESS_TOKEN secret" >&2
+            exit 1
+          fi
+
+          curl --fail --silent --show-error \
+            -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN" \
+            "https://api.figma.com/v1/files/$FIGMA_FILE_KEY/variables/local" \
+            > haka-variables.json
+
+      - name: Transform tokens
+        run: |
+          echo "TODO: transform haka-variables.json into your team format"
+          echo "Environment: ${{ inputs.environment }}"
+
+      - name: Publish artifacts
+        run: |
+          echo "TODO: commit generated tokens, open review, publish package, or upload artifact"
