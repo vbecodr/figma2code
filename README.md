@@ -2,6 +2,8 @@
 
 This repository is a small set of GitHub Actions workflow examples for moving design tokens from Figma into a code publishing pipeline.
 
+It is intended to be paired with the Figma plugin [HaKa](https://www.figma.com/community/plugin/1640753412567944113).
+
 ## What this is for
 
 Use this repo as a starting point when you want to:
