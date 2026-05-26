@@ -5,7 +5,7 @@ on:
     inputs:
       figma_file_key:
         description: Figma file key
-        required: true
+        required: false
         type: string
       environment:
         description: Target environment
@@ -23,27 +23,39 @@ on:
         description: Optional release note
         required: false
         type: string
+      variables_payload_format:
+        description: Variables payload format from HaKa
+        required: true
+        default: canonical
+        type: choice
+        options:
+          - canonical
+          - figma_enriched_canonical
+      variables_payload_json:
+        description: Variables payload JSON from HaKa
+        required: true
+        type: string
       source:
         description: Trigger source
         required: false
         type: string
 
 jobs:
-  fetch-and-publish:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch Figma local variables
+      - name: Persist HaKa payload
         env:
-          FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
-          FIGMA_FILE_KEY: ${{ inputs.figma_file_key }}
+          VARIABLES_PAYLOAD_JSON: ${{ inputs.variables_payload_json }}
         run: |
-          curl -sS             -H "X-Figma-Token: ${FIGMA_TOKEN}"             "https://api.figma.com/v1/files/${FIGMA_FILE_KEY}/variables/local"             > figma-variables.json
+          printf '%s' "$VARIABLES_PAYLOAD_JSON" > haka-variables.json
 
       - name: Transform tokens
         run: |
-          echo "TODO: transform figma-variables.json into DTCG JSON"
+          echo "TODO: transform haka-variables.json into your team format"
+          echo "Payload format: ${{ inputs.variables_payload_format }}"
 
       - name: Publish artifacts
         run: |

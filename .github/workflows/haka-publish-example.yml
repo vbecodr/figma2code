@@ -25,6 +25,18 @@ on:
         description: Figma file key
         required: false
         type: string
+      variables_payload_format:
+        description: Variables payload format from HaKa
+        required: true
+        default: canonical
+        type: choice
+        options:
+          - canonical
+          - figma_enriched_canonical
+      variables_payload_json:
+        description: Variables payload JSON from HaKa
+        required: true
+        type: string
       source:
         description: Caller
         required: false
@@ -42,21 +54,15 @@ jobs:
           echo "Destination: ${{ inputs.destination }}"
           echo "Release note: ${{ inputs.release_note }}"
           echo "Figma file key: ${{ inputs.figma_file_key }}"
+          echo "Variables payload format: ${{ inputs.variables_payload_format }}"
 
-      - name: Fetch variables from Figma REST
+      - name: Write variables payload
         env:
-          FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
-          FIGMA_FILE_KEY: ${{ inputs.figma_file_key }}
+          VARIABLES_PAYLOAD_JSON: ${{ inputs.variables_payload_json }}
         run: |
-          if [ -z "$FIGMA_TOKEN" ] || [ -z "$FIGMA_FILE_KEY" ]; then
-            echo "Provide FIGMA_TOKEN secret and figma_file_key input before using this workflow."
-            exit 1
-          fi
-          curl --fail --silent \
-            --header "X-Figma-Token: $FIGMA_TOKEN" \
-            "https://api.figma.com/v1/files/$FIGMA_FILE_KEY/variables/local" \
-            > figma-variables.json
+          printf '%s' "$VARIABLES_PAYLOAD_JSON" > haka-variables.json
 
       - name: Run team publish logic
         run: |
           echo "Replace this step with your team-owned token transform and release steps."
+          echo "Payload written to haka-variables.json"
